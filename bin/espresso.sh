@@ -32,6 +32,11 @@ var opts = nomnom
       help: 'Basic ES2015 transforms, i.e. arrowFunctions, object methods, and import/exports',
       default: true
     },
+    requireToImport: {
+      flag: true,
+      help: 'Convert require statements to ES2015 import statements',
+      default: true
+    },
     jsx: {
       flag: true,
       help: 'Transform any available React.DOM or Components to JSX',
