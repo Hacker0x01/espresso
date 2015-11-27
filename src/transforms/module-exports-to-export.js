@@ -15,14 +15,14 @@ function moduleExportsToExport (file, api) {
     }
   }
 
-  root
+  var moduleExportsConverted = root
   .find(j.ExpressionStatement, MODULE_EXPORTS)
   .replaceWith(function (p) {
     return j.exportDeclaration(true, p.node.expression.right)
   })
   .size() > 0
 
-  if (requiresTransformed) {
+  if (moduleExportsConverted) {
     return root.toSource()
   }
 

@@ -13,7 +13,7 @@ function requireToImport (file, api) {
     }
   }
 
-  requiresTransformed = root
+  var requiresTransformed = root
   .find(j.CallExpression, REQUIRE)
   .forEach(function (p) {
     var parentCall = p.parent.node.type === 'CallExpression' ? p.parent : false
