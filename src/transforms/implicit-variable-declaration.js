@@ -43,9 +43,14 @@ function implicitVariableDeclaration (file, api) {
 
       if (matchIndex > -1) {
         variables.splice(matchIndex, 1)
+        var parentIf = findParentOfType(p, 'IfStatement');
 
-        if (findParentOfType(p, 'IfStatement')) {
-          findParentOfType(p, 'IfStatement').insertBefore(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.expression.left.name), null)]))
+        if (parentIf) {
+          while(parentIf.parent.node.type === "IfStatement") {
+            parentIf = parentIf.parent
+          }
+
+          parentIf.insertBefore(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.expression.left.name), null)]))
         } else {
           p.replace(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.expression.left.name), p.node.expression.right)]))
         }
