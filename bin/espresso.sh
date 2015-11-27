@@ -5,6 +5,7 @@
 var nomnom = require('nomnom')
 var fs = require('fs')
 var path = require('path')
+var glob = require('glob')
 
 var espresso = require('../dist/index.js')
 
@@ -14,7 +15,6 @@ var opts = nomnom
     path: {
       position: 0,
       help: 'Files or directory to transform',
-      metavar: 'FILE',
       required: true
     },
     match: {
@@ -60,18 +60,9 @@ var opts = nomnom
   })
   .parse()
 
-var pathStats = fs.lstatSync(opts.path)
-var files = []
-
-opts.path = opts.path.slice(-1) === '/' ? opts.path.slice(0, -1) : opts.path
-
-if (pathStats.isDirectory()) {
-  files = fs.readdirSync(opts.path).map(function (file) {
-    return opts.path + '/' + file
-  })
-} else if (pathStats.isFile()) {
-  files.push(opts.path)
-}
+var files = glob.sync(opts.path, {
+  nodir: true
+})
 
 files.forEach(function (file) {
   if (path.extname(file) === opts.match) {
