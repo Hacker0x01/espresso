@@ -42,6 +42,11 @@ var opts = nomnom
       help: 'Convert module.exports statements to ES2015 exports statements',
       default: true
     },
+    implicitVariableDeclaration: {
+      flag: true,
+      help: 'Convert implicit variable declarations (`var Foo;`) to explicit variable declarations',
+      default: true
+    },
     jsx: {
       flag: true,
       help: 'Transform any available React.DOM or Components to JSX',
