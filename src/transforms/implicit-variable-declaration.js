@@ -33,7 +33,7 @@ function implicitVariableDeclaration (file, api) {
   })
   .remove()
 
-  var changed = !! variables.length
+  var changed = !!variables.length
 
   root
   .find(j.ExpressionStatement, VAR_DECLARATION)
