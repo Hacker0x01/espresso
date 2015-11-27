@@ -13,18 +13,13 @@ function fatArrow (file, api) {
     ]
   }
 
-  var functionsChanged = root
-  .find(j.CallExpression, FUNCTION_BIND)
-  .replaceWith(function (p) {
-    return j.arrowFunctionExpression([], p.node.callee.body.body[0].argument.body)
-  })
-  .find(j.Identifier, {name: '_this'})
-  .replaceWith(j.identifier('this'))
-  .size() > 0
+  root
+    .find(j.CallExpression, FUNCTION_BIND)
+    .replaceWith(function (p) {
+      return j.arrowFunctionExpression([], p.node.callee.body.body[0].argument.body)
+    })
+    .find(j.Identifier, {name: '_this'})
+    .replaceWith(j.identifier('this'))
 
-  if (functionsChanged) {
-    return root.toSource()
-  }
-
-  return null
+  return root.toSource()
 }

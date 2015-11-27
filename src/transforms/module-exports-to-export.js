@@ -15,16 +15,11 @@ function moduleExportsToExport (file, api) {
     }
   }
 
-  var moduleExportsConverted = root
-  .find(j.ExpressionStatement, MODULE_EXPORTS)
-  .replaceWith(function (p) {
-    return j.exportDeclaration(true, p.node.expression.right)
-  })
-  .size() > 0
+  root
+    .find(j.ExpressionStatement, MODULE_EXPORTS)
+    .replaceWith(function (p) {
+      return j.exportDeclaration(true, p.node.expression.right)
+    })
 
-  if (moduleExportsConverted) {
-    return root.toSource()
-  }
-
-  return null
+  return root.toSource()
 }
