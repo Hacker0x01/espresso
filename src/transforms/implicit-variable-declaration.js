@@ -88,6 +88,9 @@ function implicitVariableDeclaration (file, api) {
       root
       .find(j.ImportDeclaration)
       .forEach(function (importPath) {
+        if (importPath.node.specifiers.length === 0)
+          return
+
         var name = importPath.node.specifiers[0].local.name
         if (name === varName) {
           var importIdent = j.identifier(name + 'Import')

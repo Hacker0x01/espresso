@@ -31,8 +31,13 @@ function requireToImport (file, api) {
           j.variableDeclaration('var', [j.variableDeclarator(origIdent, j.callExpression(parentCall.node.callee, [importIdent]))])
         )
       } else {
+        var specifiers = []
+
+        if (parentExpStat.node.expression.left)
+          specifiers = [j.importDefaultSpecifier(parentExpStat.node.expression.left)]
+
         parentExpStat.replace(
-          j.importDeclaration([j.importDefaultSpecifier(parentExpStat.node.expression.left)], p.node.arguments[0])
+          j.importDeclaration(specifiers, p.node.arguments[0])
         )
       }
     })
