@@ -27,14 +27,19 @@ var opts = nomnom
       help: 'The extension for transformed files, i.e. .js OR .es6',
       default: '.es6'
     },
-    core: {
-      flag: true,
-      help: 'Basic ES2015 transforms, i.e. arrowFunctions, object methods, and import/exports',
-      default: true
-    },
     requireToImport: {
       flag: true,
       help: 'Convert require statements to ES2015 import statements',
+      default: true
+    },
+    classMethod: {
+      flag: true,
+      help: 'Convert compatible function declarations to ES2015 class methods',
+      default: true
+    },
+    fatArrow: {
+      flag: true,
+      help: 'Convert CoffeeScript fat arrow methods to ES2015 fat arrow methods',
       default: true
     },
     moduleExportsToExport: {
