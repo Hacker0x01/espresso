@@ -37,6 +37,11 @@ var opts = nomnom
       help: 'Convert require statements to ES2015 import statements',
       default: true
     },
+    moduleExportsToExport: {
+      flag: true,
+      help: 'Convert module.exports statements to ES2015 exports statements',
+      default: true
+    },
     jsx: {
       flag: true,
       help: 'Transform any available React.DOM or Components to JSX',
