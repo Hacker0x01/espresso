@@ -1,6 +1,6 @@
 var test = require('tap').test
 
-var espresso = require('../../dist/')
+var espresso = require('../../src/')
 var opts = {
   jsx: true
 }

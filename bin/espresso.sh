@@ -8,7 +8,7 @@ var path = require('path')
 var glob = require('glob')
 var minimatch = require('minimatch')
 
-var espresso = require('../dist/index.js')
+var espresso = require('../src/index.js')
 
 var opts = nomnom
   .script('espresso')

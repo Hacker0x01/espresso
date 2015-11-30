@@ -15,7 +15,7 @@ function fatArrow (file, api) {
 
   root
     .find(j.CallExpression, FUNCTION_BIND)
-    .replaceWith(function (p) {
+    .replaceWith(p => {
       return j.arrowFunctionExpression([], p.node.callee.body.body[0].argument.body)
     })
     .find(j.Identifier, {name: '_this'})

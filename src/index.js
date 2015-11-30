@@ -1,5 +1,9 @@
 module.exports = espresso
 
+'use strict'
+
+require('babel-register')();
+
 var coffeeScript = require('coffee-react')
 var jsCodeShift = require('jscodeshift')
 var requireToImportTransform = require('./transforms/require-to-import')
