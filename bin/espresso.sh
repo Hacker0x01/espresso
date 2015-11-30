@@ -6,6 +6,7 @@ var nomnom = require('nomnom')
 var fs = require('fs')
 var path = require('path')
 var glob = require('glob')
+var minimatch = require('minimatch')
 
 var espresso = require('../dist/index.js')
 
@@ -65,7 +66,7 @@ var files = glob.sync(opts.path, {
 })
 
 files.forEach(function (file) {
-  if (path.extname(file) === opts.match) {
+  if (minimatch(path.basename(file), opts.match)) {
     console.log('-----------------\n', file, '\n--------------------')
     var content = fs.readFileSync(file).toString()
     var es6Content = espresso(content, opts)
