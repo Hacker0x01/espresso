@@ -53,6 +53,11 @@ var opts = nomnom
       help: 'Convert implicit variable declarations (`var Foo;`) to explicit variable declarations',
       default: true
     },
+    forLoops: {
+      flag: true,
+      help: 'Convert CoffeeScript for..in loops to ES2015 for..of loops (or forEach if the index is used)',
+      default: true
+    },
     jsx: {
       flag: true,
       help: 'Transform any available React.DOM or Components to JSX',

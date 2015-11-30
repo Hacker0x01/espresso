@@ -11,6 +11,7 @@ var moduleExportsToExportTransform = require('./transforms/module-exports-to-exp
 // var implicitVariableDeclarationTransform = require('./transforms/implicit-variable-declaration')
 var classMethodTransform = require('./transforms/class-method')
 var fatArrowTransform = require('./transforms/fat-arrow')
+var forLoopsTransform = require('./transforms/for-loops')
 var jsxTransform = require('./transforms/jsx')
 
 function espresso (content, opts) {
@@ -36,6 +37,10 @@ function espresso (content, opts) {
   // if (opts.implicitVariableDeclaration) {
   //   newContent = implicitVariableDeclarationTransform({ source: newContent }, api)
   // }
+
+  if (opts.forLoops) {
+    newContent = forLoopsTransform({ source: newContent }, api)
+  }
 
   if (opts.jsx) {
     newContent = jsxTransform({source: newContent}, api)
