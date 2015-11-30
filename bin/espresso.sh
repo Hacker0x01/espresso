@@ -57,6 +57,10 @@ var opts = nomnom
       flag: true,
       help: 'Transform any available React.DOM or Components to JSX',
       default: false
+    },
+    outDir: {
+      abbr: 'o',
+      default: 'js'
     }
   })
   .parse()
@@ -71,7 +75,7 @@ files.forEach(function (file) {
     var content = fs.readFileSync(file).toString()
     var es6Content = espresso(content, opts)
 
-    fs.writeFileSync(path.dirname(file) + '/' + path.basename(file, opts.match) + opts.extension, es6Content)
+    fs.writeFileSync(opts.outDir + '/' + path.basename(file, opts.match) + opts.extension, es6Content)
   }
 })
 console.log('Your files have been converted, disaster averted.')
