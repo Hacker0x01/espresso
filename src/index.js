@@ -11,6 +11,7 @@ var moduleExportsToExportTransform = require('./transforms/module-exports-to-exp
 // var implicitVariableDeclarationTransform = require('./transforms/implicit-variable-declaration')
 var classMethodTransform = require('./transforms/class-method')
 var backboneClassTransform = require('./transforms/backbone-classes')
+var stringInterpolationTransform = require('./transforms/string-interpolation')
 var fatArrowTransform = require('./transforms/fat-arrow')
 var forLoopsTransform = require('./transforms/for-loops')
 var jsxTransform = require('./transforms/jsx')
@@ -33,6 +34,10 @@ function espresso (content, opts) {
 
   if (opts.backboneClass) {
     newContent = backboneClassTransform({ source: newContent }, api)
+  }
+
+  if (opts.stringInterpolation) {
+    newContent = stringInterpolationTransform({ source: newContent}, api)
   }
 
   if (opts.fatArrow) {

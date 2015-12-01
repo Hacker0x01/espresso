@@ -33,6 +33,11 @@ var opts = nomnom
       help: 'Convert require statements to ES2015 import statements',
       default: true
     },
+    stringInterpolation: {
+      flag: true,
+      help: 'Convert concatenated strings to template literals',
+      default: true
+    },
     backboneClass: {
       flag: true,
       help: 'Convert Backbone classes to .extend calls',
