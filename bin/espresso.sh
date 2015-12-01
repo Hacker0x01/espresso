@@ -33,6 +33,11 @@ var opts = nomnom
       help: 'Convert require statements to ES2015 import statements',
       default: true
     },
+    backboneClass: {
+      flag: true,
+      help: 'Convert Backbone classes to .extend calls',
+      default: true
+    },
     classMethod: {
       flag: true,
       help: 'Convert compatible function declarations to ES2015 class methods',
