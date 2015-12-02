@@ -1,5 +1,10 @@
+# CAUTION: Please be advised that this project is still under active development.
+Because of the nature of this project (reverse engineering CoffeeScript patterns in JavaScript), I don't
+think that it'll be likely that this tool will ever be ready to convert every CoffeeScript codebase to
+ES6. It should be used as a helpful tool, and the changes should still be reviewed.
+
 # Espresso
-A quick shot of ES6 instead that old Coffee. 
+A quick shot of ES6 instead that old Coffee.
 
 This is a command line tool for converting CoffeeScript files into their ES6 equivalents*.
 
@@ -63,4 +68,3 @@ npm install
 npm link
 espresso --help
 ```
-
