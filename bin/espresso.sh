@@ -68,6 +68,11 @@ var opts = nomnom
       help: 'Convert CoffeeScript `1 in [1]` to `[1].indexOf(1) >= 0`',
       default: true
     },
+    defaultParams: {
+      flag: true,
+      help: 'Convert CoffeeScript default params to ES2015 default params',
+      default: true
+    },
     forLoops: {
       flag: true,
       help: 'Convert CoffeeScript for..in loops to ES2015 for..of loops (or forEach if the index is used)',
