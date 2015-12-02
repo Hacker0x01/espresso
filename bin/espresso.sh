@@ -63,6 +63,11 @@ var opts = nomnom
       help: 'Convert implicit variable declarations (`var Foo;`) to explicit variable declarations',
       default: true
     },
+    indexOf: {
+      flag: true,
+      help: 'Convert CoffeeScript `1 in [1]` to `[1].indexOf(1) >= 0`',
+      default: true
+    },
     forLoops: {
       flag: true,
       help: 'Convert CoffeeScript for..in loops to ES2015 for..of loops (or forEach if the index is used)',
