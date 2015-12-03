@@ -34,8 +34,8 @@ const transformExpressionsIntoTemplates = (root, j) => {
 
         if (templateLiteral.expressions.length > templateLiteral.quasis.length) {
           templateLiteral.quasis.push(j.templateElement({
-            cooked: '',
-            raw: ''
+            cooked: "",
+            raw: ""
           }, false));
         }
       }
@@ -50,8 +50,8 @@ const transformExpressionsIntoTemplates = (root, j) => {
 module.exports = function(file, api) {
   const j = api.jscodeshift;
   const root = j(file.source);
-
   var expressionsChanged = true;
+
   while (expressionsChanged) {
     if (!transformExpressionsIntoTemplates(root, j)) {
       expressionsChanged = false;

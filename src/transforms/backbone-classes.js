@@ -1,14 +1,14 @@
 module.exports = function(file, api) {
   var j = api.jscodeshift;
-  var isConstructor = (bodyElement) =>
-    bodyElement.type === "FunctionDeclaration"
+  var isConstructor = bodyElement =>
+    bodyElement.type === "FunctionDeclaration";
 
-  var isPrototypeMethod = (bodyElement) =>
+  var isPrototypeMethod = bodyElement =>
     bodyElement.type === "ExpressionStatement" &&
         bodyElement.expression.left &&
         bodyElement.expression.left.type === "MemberExpression" &&
         bodyElement.expression.left.object.type === "MemberExpression" &&
-        bodyElement.expression.left.object.property.name === "prototype"
+        bodyElement.expression.left.object.property.name === "prototype";
 
   return j(file.source)
     .find(j.CallExpression, {
@@ -29,17 +29,17 @@ module.exports = function(file, api) {
 
         if (isConstructor(bodyElement)) {
           property = j.property(
-            'init',
-            j.identifier('constructor'),
+            "init",
+            j.identifier("constructor"),
             j.functionExpression(
               null,
               [],
               bodyElement.body
             )
           );
-        } else if(isPrototypeMethod(bodyElement)) {
+        } else if (isPrototypeMethod(bodyElement)) {
           property = j.property(
-            'init',
+            "init",
             j.identifier(bodyElement.expression.left.property.name),
             bodyElement.expression.right
           );
@@ -55,7 +55,7 @@ module.exports = function(file, api) {
       });
 
       return j.callExpression(
-        j.memberExpression(superClass, j.identifier('extend')),
+        j.memberExpression(superClass, j.identifier("extend")),
         [
           j.objectExpression(newBody)
         ]

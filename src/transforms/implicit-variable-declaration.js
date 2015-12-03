@@ -1,124 +1,130 @@
-module.exports = implicitVariableDeclaration
+module.exports = implicitVariableDeclaration;
 
-var findParentOfType = require('../utils/find-parent-of-type')
-var parentHasType = require('../utils/parent-has-type')
+var findParentOfType = require("../utils/find-parent-of-type");
+var parentHasType = require("../utils/parent-has-type");
 
-function implicitVariableDeclaration (file, api) {
-  var j = api.jscodeshift
-  var root = j(file.source)
+function implicitVariableDeclaration(file, api) {
+  var j = api.jscodeshift;
+  var root = j(file.source);
 
   var VAR_DECLARATION = {
     expression: {
-      type: 'AssignmentExpression'
+      type: "AssignmentExpression"
     }
-  }
+  };
 
   var ASSIGN_EXP = {
-    operator: '=',
+    operator: "=",
     left: {
-      type: 'Identifier'
+      type: "Identifier"
     }
-  }
+  };
 
-  var variables = []
+  var variables = [];
+
   root
     .find(j.VariableDeclaration)
-    .filter(function (p) {
-      return p.node.declarations[0].init === null
-    })
-    .forEach(function (p) {
-      variables = variables.concat(p.node.declarations.map(function (variable) {
-        return variable.id.name
-      }))
-    })
-    .remove()
+    .filter(p => p.node.declarations[0].init === null)
+    .forEach(p =>
+      variables = variables.concat(
+        p.node.declarations.map(variable =>
+          variable.id.name
+        )
+      )
+    )
+    .remove();
 
   root
     .find(j.ExpressionStatement, VAR_DECLARATION)
-    .filter(function (p) {
-      return p.node.expression.left.type === 'Identifier'
-    })
-    .forEach(function (p) {
-      var matchIndex = variables.indexOf(p.node.expression.left.name)
+    .filter(p => p.node.expression.left.type === "Identifier")
+    .forEach(p => {
+      var matchIndex = variables.indexOf(p.node.expression.left.name);
 
       if (matchIndex > -1) {
-        variables.splice(matchIndex, 1)
-        var parentIf = findParentOfType(p, 'IfStatement');
+        variables.splice(matchIndex, 1);
+        var parentIf = findParentOfType(p, "IfStatement");
 
         if (parentIf) {
-          while(parentIf.parent.node.type === "IfStatement") {
-            parentIf = parentIf.parent
+          while (parentIf.parent.node.type === "IfStatement") {
+            parentIf = parentIf.parent;
           }
 
-          parentIf.insertBefore(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.expression.left.name), null)]))
+          parentIf.insertBefore(j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.node.expression.left.name), null)]));
         } else {
-          p.replace(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.expression.left.name), p.node.expression.right)]))
+          p.replace(j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.node.expression.left.name), p.node.expression.right)]));
         }
       }
-    })
+    });
 
   root
     .find(j.AssignmentExpression)
-    .filter(function (p) {
-      return p.node.left.type === 'Identifier' && !p.node.parenthesizedExpression && p.parent.node.type !== 'SequenceExpression'
-    })
-    .forEach(function (p) {
-      if (p.parent.node.type === 'AssignmentExpression' && variables.indexOf(p.parent.node.left.name) > -1) {
-        var matchIndex = variables.indexOf(p.parent.node.left.name)
-        variables.splice(matchIndex, 1)
+    .filter(p =>
+      p.node.left.type === "Identifier" &&
+        !p.node.parenthesizedExpression && p.parent.node.type !== "SequenceExpression"
+    )
+    .forEach(p => {
+      if (p.parent.node.type === "AssignmentExpression" && variables.indexOf(p.parent.node.left.name) > -1) {
+        var matchIndex = variables.indexOf(p.parent.node.left.name);
 
-        if (parentHasType(p.parent, 'SequenceExpression')) {
-          parentHasType(p, 'BlockStatement').insertBefore(
-            j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.parent.node.left.name), null)])
-          )
+        variables.splice(matchIndex, 1);
+
+        if (parentHasType(p.parent, "SequenceExpression")) {
+          parentHasType(p, "BlockStatement").insertBefore(
+            j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.parent.node.left.name), null)])
+          );
         } else {
-          p.parent.replace(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.parent.node.left.name), p.parent.node.right)]))
+          p.parent.replace(j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.parent.node.left.name), p.parent.node.right)]));
         }
       } else if (variables.indexOf(p.node.left.name) > -1) {
-        var match = variables.indexOf(p.node.left.name)
-        variables.splice(match, 1)
+        var match = variables.indexOf(p.node.left.name);
 
-        if (findParentOfType(p, 'ExportDeclaration')) {
-          findParentOfType(p, 'ExportDeclaration').insertBefore(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.left.name), null)]))
+        variables.splice(match, 1);
+
+        if (findParentOfType(p, "ExportDeclaration")) {
+          findParentOfType(p, "ExportDeclaration").insertBefore(j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.node.left.name), null)]));
         } else {
-          p.replace(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.left.name), p.node.right)]))
+          p.replace(j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.node.left.name), p.node.right)]));
         }
       }
-    })
+    });
 
   root
     .find(j.VariableDeclaration)
-    .forEach(function (p) {
-      var varName = p.node.declarations[0].id.name
+    .forEach(p => {
+      var varName = p.node.declarations[0].id.name;
+
       root
-      .find(j.ImportDeclaration)
-      .forEach(function (importPath) {
-        if (importPath.node.specifiers.length === 0)
-          return
+        .find(j.ImportDeclaration)
+        .forEach(importPath => {
+          if (importPath.node.specifiers.length === 0)
+            return;
 
-        var name = importPath.node.specifiers[0].local.name
-        if (name === varName) {
-          var importIdent = j.identifier(name + 'Import')
-          var varIdent = p.node.declarations[0].init.arguments[0]
-          importPath.node.specifiers[0].local = importIdent
+          var name = importPath.node.specifiers[0].local.name;
 
-          if (name === varIdent.name) {
-            varIdent.name = importIdent.name
+          if (name === varName) {
+            var importIdent = j.identifier(`${name}Import`);
+            var varIdent = p.node.declarations[0].init.arguments[0];
+
+            importPath.node.specifiers[0].local = importIdent;
+
+            if (name === varIdent.name) {
+              varIdent.name = importIdent.name;
+            }
           }
-        }
-      })
-    })
+        });
+    });
 
   root
     .find(j.AssignmentExpression, ASSIGN_EXP)
-    .filter(function (p) {
-      return variables.indexOf(p.node.left.name) > -1 && p.node.parenthesizedExpression
-    })
-    .forEach(function (p) {
-      var matchIndex = variables.indexOf(p.node.left.name)
-      variables.splice(matchIndex, 1)
-      parentHasType(p, 'BlockStatement').insertBefore(j.variableDeclaration('var', [j.variableDeclarator(j.identifier(p.node.left.name), null)]))
-    })
+    .filter(p =>
+      variables.indexOf(p.node.left.name) > -1 && p.node.parenthesizedExpression
+    )
+    .forEach(p => {
+      var matchIndex = variables.indexOf(p.node.left.name);
 
-  return root.toSource()
+      variables.splice(matchIndex, 1);
+      parentHasType(p, "BlockStatement").insertBefore(j.variableDeclaration("var", [j.variableDeclarator(j.identifier(p.node.left.name), null)]));
+    });
+
+  return root.toSource();
 }

@@ -28,7 +28,7 @@ module.exports = function(file, api) {
                 consequent.body.length === 1 &&
                 consequent.body[0].type === "ExpressionStatement" &&
                 consequent.body[0].expression.left.type === "Identifier" &&
-                consequent.body[0].expression.left.name === param.name
+                consequent.body[0].expression.left.name === param.name;
           });
         var indexOfparamIsNullIfStatement = body.indexOf(paramIsNullIfStatement);
 

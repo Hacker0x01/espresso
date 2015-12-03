@@ -1,2 +1,2 @@
-require('./specs/core')
-require('./specs/jsx')
+require("./specs/core");
+require("./specs/jsx");

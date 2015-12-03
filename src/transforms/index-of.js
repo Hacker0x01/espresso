@@ -5,14 +5,14 @@ module.exports = function(file, api) {
   root
     .find(j.CallExpression, {
       callee: {
-        type: 'MemberExpression',
+        type: "MemberExpression",
         object: {
-          type: 'Identifier',
-          name: 'indexOf'
+          type: "Identifier",
+          name: "indexOf"
         },
         property: {
-          type: 'Identifier',
-          name: 'call'
+          type: "Identifier",
+          name: "call"
         }
       }
     })
@@ -20,7 +20,7 @@ module.exports = function(file, api) {
       j.callExpression(
         j.memberExpression(
           exp.value.arguments[0],
-          j.identifier('indexOf')
+          j.identifier("indexOf")
         ),
         [
           exp.value.arguments[1]
@@ -42,7 +42,7 @@ module.exports = function(file, api) {
       );
 
       declarations.splice(indexOfIndexOfDeclarator, 1);
-    })
+    });
 
   return root
     .toSource();
