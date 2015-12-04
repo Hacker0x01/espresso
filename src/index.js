@@ -8,7 +8,7 @@ var coffeeScript = require("coffee-react");
 var jsCodeShift = require("jscodeshift");
 var requireToImportTransform = require("./transforms/require-to-import");
 var moduleExportsToExportTransform = require("./transforms/module-exports-to-export");
-// var implicitVariableDeclarationTransform = require('./transforms/implicit-variable-declaration')
+var implicitVariableDeclarationTransform = require('./transforms/implicit-variable-declaration')
 var classMethodTransform = require("./transforms/class-method");
 var backboneClassTransform = require("./transforms/backbone-classes");
 var defaultParamsTransform = require("./transforms/default-params");
@@ -54,16 +54,16 @@ function espresso(content, opts) {
     newContent = fatArrowTransform({ source: newContent }, api);
   }
 
-  // if (opts.implicitVariableDeclaration) {
-  //   newContent = implicitVariableDeclarationTransform({ source: newContent }, api)
-  // }
-
   if (opts.forLoops) {
     newContent = forLoopsTransform({ source: newContent }, api);
   }
 
   if (opts.jsx) {
     newContent = jsxTransform({ source: newContent }, api);
+  }
+
+  if (opts.implicitVariableDeclaration) {
+    newContent = implicitVariableDeclarationTransform({ source: newContent }, api)
   }
 
   return newContent;
