@@ -42,6 +42,10 @@ module.exports = function(file, api) {
       );
 
       declarations.splice(indexOfIndexOfDeclarator, 1);
+
+      if (declarations.length === 0) {
+        j(exp).remove();
+      }
     });
 
   return root
