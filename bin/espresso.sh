@@ -2,13 +2,13 @@
 
 'use strict'
 
-var nomnom = require('nomnom')
-var fs = require('fs')
-var path = require('path')
-var glob = require('glob')
-var minimatch = require('minimatch')
+var nomnom = require('nomnom');
+var fs = require('fs');
+var path = require('path');
+var minimatch = require('minimatch');
+var execSync = require('child_process').execSync;
 
-var espresso = require('../src/index.js')
+var espresso = require('../src/index.js');
 
 var opts = nomnom
   .script('espresso')
@@ -16,6 +16,8 @@ var opts = nomnom
     path: {
       position: 0,
       help: 'Files or directory to transform',
+      list: true,
+      metavar: 'FILE',
       required: true
     },
     match: {
@@ -88,19 +90,19 @@ var opts = nomnom
       default: 'js'
     }
   })
-  .parse()
+  .parse();
 
-var files = glob.sync(opts.path, {
-  nodir: true
-})
+opts.path.forEach(function (filePath) {
+  if (!minimatch(path.basename(filePath), opts.match)) return;
+  if (fs.lstatSync(filePath).isDirectory()) return;
 
-files.forEach(function (file) {
-  if (minimatch(path.basename(file), opts.match)) {
-    console.log('-----------------\n', file, '\n--------------------')
-    var content = fs.readFileSync(file).toString()
-    var es6Content = espresso(content, opts)
+  console.log('-----------------\n', filePath, '\n--------------------');
+  var content = fs.readFileSync(path.resolve(filePath)).toString();
+  var es6Content = espresso(content, opts);
+  var outDir = opts.outDir + '/' + path.dirname(filePath);
 
-    fs.writeFileSync(opts.outDir + '/' + path.basename(file, opts.match) + opts.extension, es6Content)
-  }
-})
-console.log('Your files have been converted, disaster averted.')
+  execSync('mkdir -p ' + outDir);
+  fs.writeFileSync(outDir + '/' + path.basename(filePath)  + opts.extension, es6Content);
+});
+
+console.log('Your files have been converted, disaster averted.');
