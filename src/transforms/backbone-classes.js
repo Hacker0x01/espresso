@@ -11,7 +11,7 @@ module.exports = function(file, api) {
         bodyElement.expression.left.object.type === "MemberExpression" &&
         bodyElement.expression.left.object.property.name === "prototype";
 
-  var transformConstructorBody = bodyElement => {
+  var transformConstructorBody = (bodyElement, superClass) => {
     j(bodyElement)
       .find(j.AssignmentExpression, {
         left: {
@@ -41,6 +41,45 @@ module.exports = function(file, api) {
           )
         )
       );
+
+    j(bodyElement)
+      .find(j.ReturnStatement, {
+        argument: {
+          type: 'CallExpression',
+          callee: {
+            type: 'MemberExpression',
+            object: {
+              type: 'MemberExpression',
+              object: {
+                type: 'MemberExpression',
+                object: { type: 'Identifier' },
+                property: { type: 'Identifier', name: '__super__' }
+              },
+              property: { type: 'Identifier', name: 'constructor' }
+            },
+            property: { type: 'Identifier', name: 'apply' }
+          },
+          arguments: [
+            { type: 'ThisExpression' },
+            { type: 'Identifier', name: 'arguments' }
+          ]
+        }
+      })
+      .replaceWith(exp =>
+        j.expressionStatement(
+          j.callExpression(
+            j.memberExpression(
+              j.memberExpression(
+                superClass,
+                j.identifier('prototype')
+              ),
+              j.identifier('apply')
+            ),
+            exp.value.argument.arguments
+          )
+        )
+      );
+
     return bodyElement;
   };
 
@@ -68,7 +107,7 @@ module.exports = function(file, api) {
             j.functionExpression(
               null,
               [],
-              transformConstructorBody(bodyElement.body)
+              transformConstructorBody(bodyElement.body, superClass)
             )
           );
         } else if (isPrototypeMethod(bodyElement)) {
