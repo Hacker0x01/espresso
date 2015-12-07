@@ -1,7 +1,6 @@
-var removeVariableDeclarator = require('../utils/remove-variable-declarator');
-
 module.exports = function(file, api) {
   var j = api.jscodeshift;
+  var removeVariableDeclarator = require('../utils/remove-variable-declarator');
   var isConstructor = bodyElement =>
     bodyElement.type === "FunctionDeclaration";
 
@@ -11,6 +10,39 @@ module.exports = function(file, api) {
         bodyElement.expression.left.type === "MemberExpression" &&
         bodyElement.expression.left.object.type === "MemberExpression" &&
         bodyElement.expression.left.object.property.name === "prototype";
+
+  var transformConstructorBody = bodyElement => {
+    j(bodyElement)
+      .find(j.AssignmentExpression, {
+        left: {
+          type: 'MemberExpression',
+          object: {
+            type: 'ThisExpression'
+          }
+        },
+        right: {
+          type: 'CallExpression',
+          callee: {
+            type: 'Identifier',
+            name: 'bind'
+          }
+        }
+      })
+      .replaceWith(exp =>
+        j.assignmentExpression(
+          '=',
+          exp.value.left,
+          j.callExpression(
+            j.memberExpression(
+              exp.value.right.arguments[0],
+              j.identifier('bind')
+            ),
+            exp.value.right.arguments.slice(1)
+          )
+        )
+      );
+    return bodyElement;
+  };
 
   return j(file.source)
     .find(j.CallExpression, {
@@ -29,14 +61,14 @@ module.exports = function(file, api) {
       callee.body.body.forEach(bodyElement => {
         var property;
 
-        if (isConstructor(bodyElement) && bodyElement.body.length > 1) {
+        if (isConstructor(bodyElement) && bodyElement.body.body.length > 1) {
           property = j.property(
             "init",
             j.identifier("constructor"),
             j.functionExpression(
               null,
               [],
-              bodyElement.body
+              transformConstructorBody(bodyElement.body)
             )
           );
         } else if (isPrototypeMethod(bodyElement)) {
@@ -58,6 +90,7 @@ module.exports = function(file, api) {
 
       removeVariableDeclarator("extend", exp.scope.path, api);
       removeVariableDeclarator("hasProp", exp.scope.path, api);
+      removeVariableDeclarator("bind", exp.scope.path, api);
 
       return j.callExpression(
         j.memberExpression(superClass, j.identifier("extend")),
