@@ -1,3 +1,5 @@
+var removeVariableDeclarator = require('../utils/remove-variable-declarator');
+
 module.exports = function(file, api) {
   var j = api.jscodeshift;
   var isConstructor = bodyElement =>
@@ -27,7 +29,7 @@ module.exports = function(file, api) {
       callee.body.body.forEach(bodyElement => {
         var property;
 
-        if (isConstructor(bodyElement)) {
+        if (isConstructor(bodyElement) && bodyElement.body.length > 1) {
           property = j.property(
             "init",
             j.identifier("constructor"),
@@ -53,6 +55,9 @@ module.exports = function(file, api) {
           newBody.push(property);
         }
       });
+
+      removeVariableDeclarator("extend", exp.scope.path, api);
+      removeVariableDeclarator("hasProp", exp.scope.path, api);
 
       return j.callExpression(
         j.memberExpression(superClass, j.identifier("extend")),
