@@ -11,7 +11,7 @@ module.exports = function(file, api) {
         bodyElement.expression.left.object.type === "MemberExpression" &&
         bodyElement.expression.left.object.property.name === "prototype";
 
-  var transformConstructorBody = (bodyElement, superClass) => {
+  var transformConstructorBody = (bodyElement) => {
     j(bodyElement)
       .find(j.AssignmentExpression, {
         left: {
@@ -42,46 +42,41 @@ module.exports = function(file, api) {
         )
       );
 
-    j(bodyElement)
-      .find(j.ReturnStatement, {
-        argument: {
-          type: 'CallExpression',
-          callee: {
+    return bodyElement;
+  };
+
+  var transformSuperCalls = (classBody, superClass) =>
+    j(classBody)
+      .find(j.CallExpression, {
+        callee: {
+          type: 'MemberExpression',
+          object: {
             type: 'MemberExpression',
             object: {
               type: 'MemberExpression',
-              object: {
-                type: 'MemberExpression',
-                object: { type: 'Identifier' },
-                property: { type: 'Identifier', name: '__super__' }
-              },
-              property: { type: 'Identifier', name: 'constructor' }
+              object: { type: 'Identifier' },
+              property: { type: 'Identifier', name: '__super__' }
             },
-            property: { type: 'Identifier', name: 'apply' }
+            property: { type: 'Identifier' }
           },
-          arguments: [
-            { type: 'ThisExpression' },
-            { type: 'Identifier', name: 'arguments' }
-          ]
+          property: { type: 'Identifier', name: 'apply' }
         }
       })
       .replaceWith(exp =>
-        j.expressionStatement(
-          j.callExpression(
+        j.callExpression(
+          j.memberExpression(
             j.memberExpression(
+              superClass,
               j.memberExpression(
-                superClass,
-                j.identifier('prototype')
-              ),
-              j.identifier('apply')
+                j.identifier('prototype'),
+                exp.value.callee.object.property
+              )
             ),
-            exp.value.argument.arguments
-          )
+            j.identifier('apply')
+          ),
+          exp.value.arguments
         )
       );
-
-    return bodyElement;
-  };
 
   return j(file.source)
     .find(j.CallExpression, {
@@ -107,7 +102,7 @@ module.exports = function(file, api) {
             j.functionExpression(
               null,
               [],
-              transformConstructorBody(bodyElement.body, superClass)
+              transformConstructorBody(bodyElement.body)
             )
           );
         } else if (isPrototypeMethod(bodyElement)) {
@@ -130,6 +125,8 @@ module.exports = function(file, api) {
       removeVariableDeclarator("extend", exp.scope.path, api);
       removeVariableDeclarator("hasProp", exp.scope.path, api);
       removeVariableDeclarator("bind", exp.scope.path, api);
+
+      transformSuperCalls(newBody, superClass);
 
       return j.callExpression(
         j.memberExpression(superClass, j.identifier("extend")),
